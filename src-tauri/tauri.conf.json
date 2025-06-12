@@ -57,7 +57,7 @@
       ]
     },
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdGOTBFNjg2MzFGM0RDODUKUldTRjNQTXhodWFRZjc2MTNVeXRONGJkRjdGUXlCeW1MSlZESUczT0U4eE5hKzBmY3M2S0U2L0oK",
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDE1MzFEMjg4QjhFMzgyMUIKUldRYmd1TzRpTkl4RmZac2RCSDY4VGIrbTRTM21oSk9PWlVPdDYrTG1UQnNwN0M0Qk5MRWlUZWEK",
       "endpoints": [
         "https://www.encroissant.org/updates"
       ]
