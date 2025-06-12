@@ -37,15 +37,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: Debug Build Environment
-        run: |
-          echo "Checking versions..."
-          rustc --version
-          cargo --version
-          pnpm --version
-          echo "Checking environment variables..."
-          env
-
       - name: Rust setup
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -70,6 +61,15 @@ jobs:
 
       - name: Install app dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Debug Build Environment
+        run: |
+          echo "Checking versions..."
+          rustc --version
+          cargo --version
+          pnpm --version
+          echo "Checking environment variables..."
+          env
 
       - name: Build the app
         uses: tauri-apps/tauri-action@v0
