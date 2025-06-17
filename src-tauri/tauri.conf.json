@@ -55,9 +55,8 @@
           "takesValue": true
         }
       ]
-    },
-    "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDFEQzMzMjlCRTY1QzczRkQKUldUOWMxem1tekxESFJxOUZHQ2pPY3I4REdYTWxsd1FDVTg4UGNkRnAvYzI3RjhoSnpIOXZYT2YK",
+    },    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDQxQzA4MEIwNEI0NkQ4QTcKUldTbjJFWkxzSURBUWJ1cm03NTVITk54SlZKT0RTREhtaDl6VzNuVXF3QjJFeEdiU3lrMElyTUEK",
       "endpoints": [
         "https://www.encroissant.org/updates"
       ]
