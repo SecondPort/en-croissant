@@ -13,18 +13,18 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest' # for Arm based macs (M1 and above).
-            args: '--target aarch64-apple-darwin --bundles dmg'
-          - platform: 'macos-latest' # for Intel based macs.
-            args: '--target x86_64-apple-darwin --bundles dmg'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: '--bundles nsis'
+          - platform: "macos-latest" # for Arm based macs (M1 and above).
+            args: "--target aarch64-apple-darwin --bundles dmg"
+          - platform: "macos-latest" # for Intel based macs.
+            args: "--target x86_64-apple-darwin --bundles dmg"
+          - platform: "ubuntu-22.04"
+            args: ""
+          - platform: "windows-latest"
+            args: "--bundles nsis"
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04'
@@ -33,23 +33,23 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - name: Rust setup
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@v1
         with:
           # Only install macos targets on macos runners
           targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
-        uses: swatinem/rust-cache@v2
+        uses: swatinem/rust-cache@v1
         with:
           workspaces: "./src-tauri -> target"
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v3
         with:
           version: 9
 
       - name: Sync node version and setup cache
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
           node-version: "lts/*"
           cache: "pnpm"
@@ -58,7 +58,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build the app
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.4
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
