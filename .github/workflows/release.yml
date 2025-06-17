@@ -56,17 +56,103 @@ jobs:
         id: security-check
         run: |
           echo "Running security audit..."
-          pnpm audit --audit-level high
-          echo "passed=true" >> $GITHUB_OUTPUT
+
+          # Run audit and check for critical vulnerabilities
+          if pnpm audit --audit-level critical; then
+            echo "✅ No critical vulnerabilities found"
+            echo "passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Critical vulnerabilities found"
+            echo "Please update the following packages before release:"
+            echo "- vitest to >=2.1.9 (RCE fix)"
+            echo "- @tauri-apps/plugin-shell to >=2.2.1 (scope validation fix)" 
+            echo "- ws to >=8.17.1 (DoS fix - indirect via jsdom)"
+            echo ""
+            echo "Run: pnpm update vitest@latest @tauri-apps/plugin-shell@latest"
+            echo "passed=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
         continue-on-error: false
+
+      - name: Install jq for JSON parsing
+        run: sudo apt-get update && sudo apt-get install -y jq
+        if: steps.security-check.outputs.passed == 'false'
+
+      - name: Security recommendations
+        if: always()
+        run: |
+          echo "## 🔒 Security Recommendations"
+          echo ""
+          echo "Based on the audit results, consider updating:"
+          echo "1. **vitest**: Update to >=2.1.9 to fix RCE vulnerability"
+          echo "2. **@tauri-apps/plugin-shell**: Update to >=2.2.1 for scope validation fix"
+          echo "3. **ws**: Update to >=8.17.1 (indirect via jsdom) for DoS protection"
+          echo ""
+          echo "Run: \`pnpm update vitest @tauri-apps/plugin-shell\`"
 
       - name: Check for known vulnerabilities
         run: |
           echo "Checking for known security issues..."
           # Add any additional security checks here
 
+      - name: Create Security Issue
+        if: steps.security-check.outputs.passed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 Critical Security Vulnerabilities Found - Release ${context.ref}`;
+            const body = `
+            ## Security Audit Failed
+
+            Critical vulnerabilities were found during the security audit for release ${context.ref}.
+
+            ### Issues Found:
+            - **vitest**: Update to >=2.1.9 (RCE vulnerability)
+            - **@tauri-apps/plugin-shell**: Update to >=2.2.1 (scope validation)
+            - **ws**: Update to >=8.17.1 (DoS vulnerability via jsdom)
+
+            ### Action Required:
+            1. Update the vulnerable packages using: \`pnpm update vitest@latest @tauri-apps/plugin-shell@latest\`
+            2. Run \`pnpm audit --audit-level critical\` to verify fixes
+            3. Re-run the release workflow
+
+            ### Reference:
+            See [SECURITY-AUDIT.md](./SECURITY-AUDIT.md) for detailed fix instructions.
+
+            **This issue was automatically created by the release workflow.**
+            `;
+
+            try {
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                labels: 'security,vulnerability'
+              });
+              
+              const existingIssue = issues.find(issue => 
+                issue.title.includes('Critical Security Vulnerabilities Found')
+              );
+              
+              if (!existingIssue) {
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: title,
+                  body: body,
+                  labels: ['security', 'vulnerability', 'critical']
+                });
+                console.log('Security issue created successfully');
+              } else {
+                console.log('Security issue already exists');
+              }
+            } catch (error) {
+              console.log('Failed to create issue:', error.message);
+            }
   release:
     needs: security-check
+    # Only run if security check passed or has dev-only warnings
+    if: needs.security-check.outputs.security-passed == 'true'
     permissions:
       contents: write
       id-token: write
