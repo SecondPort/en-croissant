@@ -33,7 +33,9 @@
       "providerShortName": null,
       "signingIdentity": "-"
     },
-    "resources": [],
+    "resources": [
+      "../public/sound/**/*"
+    ],
     "targets": "all",
     "createUpdaterArtifacts": "v1Compatible"
   },
